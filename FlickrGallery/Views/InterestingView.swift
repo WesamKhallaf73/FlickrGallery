@@ -152,6 +152,7 @@ struct InterestingView: View {
             
             VStack {
                 if let image = phase.image {
+                    
 
                     image
                         .resizable()
@@ -163,12 +164,12 @@ struct InterestingView: View {
                     
                         .contextMenu{
                             Button  {
-                               // backgroundColor = .red
+                                vm.saveImageToPhotoAlbum(image)
+                                
                                 
                             }label: {
                                 Label("Save to Photo Album" , systemImage: "tray.and.arrow.down.fill")
-                                   // .foregroundColor(.red) here forgroundcolor will not work
-                                // instead use role .destructive to have it in red color
+                                  
                             }
                             Button {
                               //  backgroundColor = .green
@@ -291,3 +292,6 @@ struct InterestingView_Previews: PreviewProvider {
         InterestingView()
     }
 }
+
+
+

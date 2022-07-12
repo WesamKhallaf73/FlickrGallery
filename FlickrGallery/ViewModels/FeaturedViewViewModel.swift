@@ -24,6 +24,19 @@ class FeaturedViewViewModel : ObservableObject {
     }
     
     
+    func removeat (_ offsets : IndexSet) {
+        featuredPhotos.remove(atOffsets: offsets)
+        save()
+    }
+    
+   private  func save() {
+       
+       
+       FileManager.writeToDocumentDirectory(data: featuredPhotos, withFileName: "FeaturedPhotos", withProtectionEnabled: true)
+        
+    }
+    
+    
     init() {
         loadFeaturedList()
        
@@ -62,6 +75,8 @@ class FeaturedViewViewModel : ObservableObject {
           
             
     }
+    
+    
     
     
 }

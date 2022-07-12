@@ -124,16 +124,21 @@ class InterstingPhotosViewModel : ObservableObject {
     
     
     
-    
+    func saveImageToPhotoAlbum (_ image : Image) {
+        
+        let imageSaver = ImageSaver {
+            print( "photo saved successfully ")
+        } e: { e in
+            print ("error saving the photo , \(e.localizedDescription)")
+        }
+
+        imageSaver.writeToPhotoAlbum(image: image.snapshot())
+        
+    }
     
     
     
 }
 
            
-struct FeaturedPhoto : Codable  {
-   var photoInfo : PhotoUrlInfos
-    var url : String
-    
-    
-}
+

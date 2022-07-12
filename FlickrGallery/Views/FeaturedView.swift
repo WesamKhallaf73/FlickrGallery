@@ -44,8 +44,11 @@ struct FeaturedView: View {
                 .background(.darkBackground)
                 .preferredColorScheme(.dark)
                 .onAppear{  vm.loadFeaturedList() }
+                .navigationBarItems(trailing: EditButton())
             
                 .toolbar(content: {
+                    
+                    
                     
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button(showGridView ? "List" : "Grid") {
@@ -146,12 +149,18 @@ struct FeaturedView: View {
                 }label: {
                     
                     imageView(photoInfo: featuredPhoto.photoInfo)
+                        .overlay(
+                            DeleteButton(photoInfo: featuredPhoto, featuredPhotoList: $vm.featuredPhotos, onDelete: { offsets in
+                                removeRows(at: offsets)
+                            } ) , alignment: .topTrailing
+                        )
                     
                     
                     
                 }
                 
             }
+            
         }.padding([.horizontal , .bottom])
     }
     
@@ -167,23 +176,66 @@ struct FeaturedView: View {
                 }label: {
                     
                     imageView(photoInfo: featuredPhoto.photoInfo)
+                        .overlay(
+                            DeleteButton(photoInfo: featuredPhoto, featuredPhotoList: $vm.featuredPhotos, onDelete: { offsets in
+                                removeRows(at: offsets)
+                            } ) , alignment: .topTrailing
+                        )
                     
+                }
+                        
                     
                     
                 }
+
+            
                 
-            }
+            
         }.padding([.horizontal , .bottom])
         
     }
     
     
     
-    
+    func removeRows(at offsets: IndexSet) {
+            withAnimation {
+                vm.removeat(offsets)
+            }
+        }
     
     
     
 }
+
+
+struct DeleteButton: View {
+    @Environment(\.editMode) var editMode
+
+    let photoInfo: FeaturedPhoto
+    @Binding var featuredPhotoList: [FeaturedPhoto]
+    let onDelete: (IndexSet) -> ()
+
+    var body: some View {
+        VStack {
+            if self.editMode?.wrappedValue == .active {
+                Button(action: {
+                    if let index = featuredPhotoList.firstIndex(of: photoInfo) {
+                        self.onDelete(IndexSet(integer: index))
+                    }
+                }) {
+                    Image(systemName: "minus.circle")
+                        .foregroundColor(.red)
+                        .font(.title)
+                }
+                .offset(x: 10, y: -10)
+            }
+        }
+    }
+}
+
+
+
+
 
 struct FeaturedView_Previews: PreviewProvider {
     static var previews: some View {
