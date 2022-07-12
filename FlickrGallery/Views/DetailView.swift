@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import MapKit
 
 struct DetailView: View {
     
@@ -14,63 +15,136 @@ struct DetailView: View {
    @State  var  photoInfo : PhotoUrlInfos
    @State var urlString = ""
     @State var label = ""
-    
-    var layOut = [GridItem(.adaptive(minimum: 100))  ]
-    
-   // var layOut2 = [GridItem(.flexible(minimum: <#T##CGFloat#>, maximum: <#T##CGFloat#>))]
+    @State var showSheetView = false
+    @State var photoSize : PhotoSizesInfos?
   
     
+    @GestureState var magnifyBy = 1.0
+    @GestureState var lastmagnifyBy = 1.0
+    var layOut = [GridItem(.adaptive(minimum: 100))  ]
+    
+    @State var mapRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 50, longitude: 0), span: MKCoordinateSpan(latitudeDelta: 25, longitudeDelta: 25))
+    
+    
+    var magnification: some Gesture {
+            MagnificationGesture()
+                .updating($magnifyBy) { currentState, gestureState, transaction in
+                    gestureState = currentState
+                    //lastmagnifyBy = magnifyBy
+                   // scaleOfMaginification = magnifyBy
+                }.onEnded { gesture in
+                   // scaleOfMaginification = magnifyBy
+                    
+                }
+               
+
+        }
+    
+    
+    var image : UIImage?
+            
+    
     var body: some View {
-      // ScrollView {
-       // NavigationView {
+      
            ZStack {
-              // Color.white.ignoresSafeArea()
-//               Text("Loading .....!")
-//                   .padding()
-//                   .background(dVM.loadingState == .failed  ? .red : dVM.loadingState == .loading ?  .secondary  : .green  )
-//                   .clipShape(Capsule())
-//                   .opacity(dVM.loadingState == .loaded ? 0.0 : 1)
-//                   .animation(.easeInOut(duration: 3), value:dVM.loadingState )
-//
-               Group {
+              
+               VStack {
                    
                    if dVM.main != nil
                    {
                    
-                  // VStack {
+                
                        
-                       Group {
+                    
                            if URL(string: urlString) == nil {
                                listOfSizes
                            }
                            else {
-                              
-                               imageView(urlString: urlString).ignoresSafeArea()
+                               ZStack {
+                               
+                                   ScrollView([.horizontal , .vertical]) {
+                               imageView(urlString: urlString)
+                                       .frame(width:Double(photoSize?.width   ?? 600 ) * magnifyBy   ,  height: Double(photoSize?.height ?? 600) * magnifyBy )
+                                   }
+                                  
+                                   
                                        
                                    .onTapGesture {
                                        urlString = ""
+                                    
                                    }
+                                  //.scaleEffect(magnifyBy)
+                                               .gesture(magnification)
+
+    
+                                   
+                                   
+                                   
+                                   
                                
                            
                            }
+                               
+                               
+                               if dVM.main2 != nil  && dVM.locations.count > 0{
+                               VStack {
+                                   HStack {
+                                       Spacer()
+                                      
+                                       Text("show Location")
+                                           .customized(.blue, .white)
+                                           .opacity(0.7)
+                                           .onTapGesture {
+                                               showSheetView = true
+                                           }
+                                       
+                                   }
+                               }
+                           }
+                           }
                            
-                       }
+                       
           
              
                    }
-
-           }
+                   if dVM.main2 != nil  && dVM.locations.count > 0{
+                      // Text("this photo has geolocation info")
+                       
+                      // map
+                       
+                   }
+               }
+          
         }
-           .navigationTitle(urlString == "" ? "Sizes" : label)
+         //  .navigationTitle(urlString == "" ? "Sizes" : label)
+           .navigationTitle(photoInfo.title ?? "")
          
        .onAppear {
            Task{
-               print("photo id      is..........\(dVM .photoId)")
+               //print("photo id      is..........\(dVM .photoId)")
            dVM .photoId = photoInfo.id
                try await dVM.getJsonObject()
            }
        }
+       .sheet(isPresented: $showSheetView , onDismiss: {
+           showSheetView = false
+       }) {
+           if dVM.main2 != nil  && dVM.locations.count > 0 {
+               PhotoInfoView(photoinfo: photoInfo , locations: dVM.locations )
+           }
+           else {
+               PhotoInfoView(photoinfo: photoInfo )
+           }
+       }
    }
+    
+//    var map : some View {
+//        Map(coordinateRegion: $mapRegion , annotationItems: (dVM.locations ) ) {location in
+//
+//            MapMarker(coordinate: CLLocationCoordinate2D(latitude: Double(location.latitude)!, longitude: Double(location.longitude)!), tint: .red)
+//        
+//    }
+//    }
     
     var listOfSizes : some View {
         
@@ -79,31 +153,29 @@ struct DetailView: View {
        // LazyVGrid(columns: layOut)
         ScrollView {
              VStack {
-            ForEach(dVM.main!.sizes.size.reversed() , id:\.label) {size in
+                 ForEach(dVM.main!.sizes.size.sorted(by: { size1, size2 in
+                     size1.width! * size1.height! > size2.width! * size2.height!
+                 }) , id:\.label) {size in
                 
               
-                   // Circle().fill(.red)
+               
                     Text("\(size.label ?? "no label")")
                     .customized(.blue, .white)
                     .font(.title)
                     .padding()
-                   // .foregroundColor(.white)
-                    //.clipShape(Capsule())
-                   // .padding()
-                  //  .clipShape(Circle()).background(.red)
+                   
               
                 
                     .onTapGesture {
                        urlString = urlForLabel( size.label ?? "")
                         label = size.label ?? ""
+                        self.photoSize = size
                     }
             
              }
          }
         }
-            // .frame(width: 300, height: .infinity)
-        //.foregroundColor(.white)
-       // .background(.blue)
+     
         
     }
     
@@ -120,14 +192,15 @@ struct DetailView: View {
         
     }
     
+
+    
     
     func imageView(urlString : String) -> some View {
         
       //////    print ("url is  :  \(urlString) ")
         
         guard URL(string: urlString) != nil else { fatalError("error \(urlString)")}
-       // let testUrl = "https:\/\/live.staticflickr.com\/65535\/52185835178_ae69632003_o.jpg"
-
+      
        return CacheAsyncImage(url: URL(string:  urlString)! , scale: 3) {   phase  in
             
             
@@ -138,12 +211,13 @@ struct DetailView: View {
 
                     image
                     
-                      // .resizable()
+                       .resizable()
                         
                        .aspectRatio( contentMode: .fill)
                        // .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
                         //.clipped()
                        // .aspectRatio(1, contentMode: .fit)
+                    
                    
                 }
 
@@ -195,3 +269,38 @@ struct DetailView_Previews: PreviewProvider {
 
 
 
+/*
+ 
+ 
+ Map(coordinateRegion: $viewModel.mapRegion , annotationItems: viewModel.locations) {location in
+                 // MapMarker(coordinate: CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude), tint: .red)
+                 
+                 
+                 
+                 MapAnnotation(coordinate: location.coordinate)  {
+                     
+                     
+                     
+                     VStack {
+                         Image(systemName: "star.circle")
+                             .resizable()
+                             .foregroundColor(.red)
+                             .frame(width: 44, height: 44)
+                             .background(.white)
+                             .clipShape(Circle())
+                         
+                         Text(location.name)
+                             .font(.body)
+                             .fixedSize()
+                             .foregroundColor(.black)
+                         
+                     }.onTapGesture {
+                         viewModel.selectedPlace = location
+                     }
+                     
+                     
+                 }
+                 
+             }
+             .ignoresSafeArea()
+ */

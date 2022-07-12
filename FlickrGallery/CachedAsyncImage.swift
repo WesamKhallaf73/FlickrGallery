@@ -33,7 +33,7 @@ struct CacheAsyncImage<Content>: View where Content: View{
             let _ = print("already cached: \(url.absoluteString)")
             content(.success(cached))
         }else{
-            let _ = print("request: \(url.absoluteString)")
+            let _ = print("request: \(url)") //url.absoluteString
             AsyncImage(
                 url: url,
                 scale: scale,

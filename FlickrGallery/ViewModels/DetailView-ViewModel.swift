@@ -62,7 +62,7 @@ class DetailViewModel : ObservableObject {
                 print (self.main2?.photo.location.latitude)
                 print (self.main2?.photo.location.longitude)
             
-                
+                locations.append(self.main2!.photo.location)
             
             }
             else {
@@ -85,7 +85,7 @@ class DetailViewModel : ObservableObject {
     
     
 
-        
+    var locations : [Location] = []
         
     
 

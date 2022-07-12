@@ -9,10 +9,10 @@ import SwiftUI
 
 struct InterestingView: View {
     @StateObject var vm  = InterstingPhotosViewModel ()
-    @State private var showGridView = true
+    @State private var showGridView = false
    // let date
-    @State private var date : Date = Date(timeInterval: -3600 * 24 * 30 , since: .now )
-    @State private var hidePhotosdetail = false
+    @State private var date : Date = Date(timeInterval: -3600 * 24 * 40 , since: .now )
+    @State private var hidePhotosdetail = true
     @State private var showDatePicker = false
     
     var layOut = [GridItem(.adaptive(minimum: 150))]
@@ -46,7 +46,7 @@ struct InterestingView: View {
             
             if vm.main != nil {
                 
-                Group {
+            
                     
                     if (vm.main?.photos.photo.count != 0 ) {
                 
@@ -70,7 +70,7 @@ struct InterestingView: View {
                             .padding()
                         
                     }
-                }
+                
             
             }
         
@@ -124,7 +124,8 @@ struct InterestingView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     
                     Toggle(isOn: $showDatePicker) {
-                        Text("\(showDatePicker ? "Search date" : "Show Date")")
+                        Text("\(showDatePicker ? "No Specific Date" :"Use date"  )")
+                            .font(.body)
                                     
                                 }
                 }
@@ -159,6 +160,25 @@ struct InterestingView: View {
                         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
                         .clipped()
                         .aspectRatio(1, contentMode: .fit)
+                    
+                        .contextMenu{
+                            Button  {
+                               // backgroundColor = .red
+                                
+                            }label: {
+                                Label("Save to Photo Album" , systemImage: "tray.and.arrow.down.fill")
+                                   // .foregroundColor(.red) here forgroundcolor will not work
+                                // instead use role .destructive to have it in red color
+                            }
+                            Button {
+                              //  backgroundColor = .green
+                                vm.addToFeaturedList(photoInfo: photoInfo)
+                            }label: {
+                                Label("Save to featured list" , systemImage: "star.circle.fill")
+                            }
+                           
+                        }
+               
 
                 }
 
@@ -188,7 +208,7 @@ struct InterestingView: View {
 
             }
                  .customizedframeHeight(showGridView ? true : false)
-        
+                
             
             
             
@@ -259,7 +279,7 @@ struct InterestingView: View {
     
     
     
-    
+  
     
     
     

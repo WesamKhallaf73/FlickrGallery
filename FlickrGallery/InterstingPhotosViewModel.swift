@@ -17,7 +17,9 @@ class InterstingPhotosViewModel : ObservableObject {
     
     @Published var loadingState : LoadingStates = .loading
     var  formatter = DateFormatter ()
-    var searchDate : Date? = Date(timeInterval: -10000000, since: .now) {didSet {
+    
+   //Date(timeInterval: -10000000, since: .now)
+    var searchDate : Date?  {didSet {
         Task {
         try? await getJsonObject()
         }
@@ -106,9 +108,32 @@ class InterstingPhotosViewModel : ObservableObject {
     }
     
     
+    func addToFeaturedList(photoInfo : PhotoUrlInfos) {
+        var featuredList: [FeaturedPhoto] = []
+        let existingFeaturedList : [FeaturedPhoto]?
+        existingFeaturedList = FileManager.readFromDocumentDirectory(withFileName: "FeaturedPhotos")
+        if existingFeaturedList != nil {
+            featuredList = existingFeaturedList!
+
+        }
+        featuredList.append(FeaturedPhoto (photoInfo: photoInfo, url: ImageUrl(from: photoInfo)))
+        FileManager.writeToDocumentDirectory(data: featuredList, withFileName: "FeaturedPhotos", withProtectionEnabled: true)
+
+    }
+
+    
+    
+    
+    
     
     
     
 }
 
            
+struct FeaturedPhoto : Codable  {
+   var photoInfo : PhotoUrlInfos
+    var url : String
+    
+    
+}

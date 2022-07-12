@@ -18,6 +18,8 @@ struct ContentView: View {
     
     var body: some View {
         TabView {
+            
+           
             InterestingView()
                 .tabItem {
                     Label("Interresting" , systemImage: "circle.grid.3x3.circle.fill")
@@ -31,6 +33,7 @@ struct ContentView: View {
                 .tabItem {
                     Label("Featured" , systemImage: "star.circle.fill")
                 }
+           
             SavedView()
                 .tabItem {
                     Label("Saved" , systemImage: "tray.and.arrow.down.fill")
