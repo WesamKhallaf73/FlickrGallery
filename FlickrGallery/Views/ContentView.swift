@@ -34,9 +34,10 @@ struct ContentView: View {
                     Label("Featured" , systemImage: "star.circle.fill")
                 }
            
-            SavedView()
+            HotTagView()
                 .tabItem {
-                    Label("Saved" , systemImage: "tray.and.arrow.down.fill")
+                    Label("Hot" , systemImage: "flame.fill")
+                        .foregroundColor(.red)
                 }
             
         }.background(.gray)

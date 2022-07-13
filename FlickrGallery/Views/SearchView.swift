@@ -130,6 +130,25 @@ struct SearchView: View {
                         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
                         .clipped()
                         .aspectRatio(1, contentMode: .fit)
+                    
+                        .contextMenu{
+                            Button  {
+                                vm.saveImageToPhotoAlbum(image)
+                                
+                                
+                            }label: {
+                                Label("Save to Photo Album" , systemImage: "tray.and.arrow.down.fill")
+                                  
+                            }
+                            Button {
+                              //  backgroundColor = .green
+                                vm.addToFeaturedList(photoInfo: photoInfo)
+                            }label: {
+                                Label("Save to featured list" , systemImage: "star.circle.fill")
+                            }
+                           
+                        }
+                    
 
                 }
 

@@ -1,43 +1,35 @@
 //
-//  ViewModel.swift
+//  HotTagViewModel.swift
 //  FlickrGallery
 //
-//  Created by Wesam Khallaf on 30/06/2022.
+//  Created by Wesam Khallaf on 12/07/2022.
 //
 
 import SwiftUI
 @MainActor
-class ViewModel : ObservableObject {
+class HotTagViewModel : ObservableObject {
     
-    @Published var  main : FlickrDataOfSearchMethod?
-    @Published var networkServer : NetworkServer<FlickrDataOfSearchMethod>?
+    @Published var  main : HotTagModel?
+    @Published var networkServer : NetworkServer<HotTagModel>?
     
     //@Published var photoSizeInfos : [PhotoSizesInfos] = []
     
     @Published var loadingState : LoadingStates = .loading
     
-    var searchTag : String = "Red sea" {didSet {
-        Task {
-        try? await getJsonObject()
-        }
-    }
-        
-    }
-     
-    init() {
-      //  main = try?  await getFlickrData()
-    }
-    
+    var period = "day"
+    var count = 40
     
     func getJsonObject() async throws {
         
-        print ("called with searchtag \(searchTag)")
-       
+       // print ("called with searchtag \(searchTag)")
+        let parameters = ["api_key" : K.flickrKey , "nojsoncallback" : "1"  ,"format"  : "json" , "period"  : period , "count" : String(count) ]
+     
         
-        self.networkServer = NetworkServer (baseUrl: "https://api.flickr.com/services/rest/?&method=flickr.photos.search",
-                                          parms: ["api_key" : K.flickrKey , "nojsoncallback" : "1"  ,"format"  : "json"  , "tags" : searchTag ],
-                                          method: "flickr.photos.search",
-                                          requiredKey: "tags")
+        networkServer = NetworkServer (baseUrl: "https://api.flickr.com/services/rest/?&method=flickr.tags.getHotList",
+                                       parms: parameters,
+                                          method: "flickr.tags.getHotList",
+                                          requiredKey: "not exist")
+                                        //  requiredKey: "tags")
         guard networkServer != nil else {return}
         do {
         self.main = try await networkServer?.getJsonData()
@@ -59,7 +51,6 @@ class ViewModel : ObservableObject {
         
     }
     
-
     
     
     func ImageUrl(from phoToInfo:PhotoUrlInfos ) -> String {
@@ -94,9 +85,6 @@ class ViewModel : ObservableObject {
     }
     
     
-   
-    
-    
     func addToFeaturedList(photoInfo : PhotoUrlInfos) {
         var featuredList: [FeaturedPhoto] = []
         let existingFeaturedList : [FeaturedPhoto]?
@@ -109,8 +97,6 @@ class ViewModel : ObservableObject {
         FileManager.writeToDocumentDirectory(data: featuredList, withFileName: "FeaturedPhotos", withProtectionEnabled: true)
 
     }
-
-    
     
     
     func saveImageToPhotoAlbum (_ image : Image) {
@@ -126,11 +112,4 @@ class ViewModel : ObservableObject {
     }
     
     
-    
-    
-    
 }
-
-           
-
-

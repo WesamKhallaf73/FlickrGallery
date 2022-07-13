@@ -263,7 +263,7 @@ struct InterestingView: View {
             ForEach(vm.main!.photos.photo) { photo  in
                 NavigationLink {
                     
-                    DetailView(photoInfo: photo) // later implementation
+                    DetailView(photoInfo: photo)
                     
                 }label: {
                     

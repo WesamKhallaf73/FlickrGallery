@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import MapKit
 
 @MainActor
 class DetailViewModel : ObservableObject {
@@ -20,7 +21,7 @@ class DetailViewModel : ObservableObject {
     
     @Published var urlsForImageWithDifferntSizes : [String] = []
     
-    
+    @State var mapRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 50, longitude: 0), span: MKCoordinateSpan(latitudeDelta: 25, longitudeDelta: 25))
      
     init(photoid: String) {
         photoId = photoid
@@ -59,8 +60,8 @@ class DetailViewModel : ObservableObject {
             self.main2 = try await networkServer2?.getJsonData()
             if self.main2 != nil {
                 
-                print (self.main2?.photo.location.latitude)
-                print (self.main2?.photo.location.longitude)
+//                print (self.main2?.photo.location.latitude)
+//                print (self.main2?.photo.location.longitude)
             
                 locations.append(self.main2!.photo.location)
             
@@ -87,6 +88,21 @@ class DetailViewModel : ObservableObject {
 
     var locations : [Location] = []
         
+    
+    
+    
+    
+    func saveImageToPhotoAlbum (_ image : Image) {
+        
+        let imageSaver = ImageSaver {
+            print( "photo saved successfully ")
+        } e: { e in
+            print ("error saving the photo , \(e.localizedDescription)")
+        }
+
+        imageSaver.writeToPhotoAlbum(image: image.snapshot())
+        
+    }
     
 
     
